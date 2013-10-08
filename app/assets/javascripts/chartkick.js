@@ -365,9 +365,12 @@
 
     // cant use object as key
     var createDataTable = function(series, columnType) {
+      // if(typeof(tooltip) === "undefined") tooltip = false;
       var data = new google.visualization.DataTable();
       data.addColumn(columnType, "");
-
+      // if (tooltip) {
+      data.addColumn({type: "string", role: "tooltip"});
+      // }
       var i, j, s, d, key, rows = [];
       for (i = 0; i < series.length; i++) {
         s = series[i];
@@ -578,7 +581,7 @@
   }
 
   function processSeries(series, opts, time) {
-    var i, j, data, r, key;
+    var i, j, data, r, key, role;
 
     // see if one series or multiple
     if (!isArray(series) || typeof series[0] !== "object" || isArray(series[0])) {
@@ -595,7 +598,13 @@
       for (j = 0; j < data.length; j++) {
         key = data[j][0];
         key = time ? toDate(key) : toStr(key);
-        r.push([key, toFloat(data[j][1])]);
+        role = data[j][2]; // Google Chart's role
+        if (role) {
+          role = time ? toDate(role) : toStr(role);
+          r.push([key, toFloat(data[j][1]), role]);
+        } else {
+          r.push([key, toFloat(data[j][1])]);  
+        }
       }
       if (time) {
         r.sort(sortByTime);
