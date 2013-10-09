@@ -364,26 +364,31 @@
     var jsOptions = jsOptionsFunc(defaultOptions, hideLegend, setMin, setMax);
 
     // cant use object as key
-    var createDataTable = function(series, columnType) {
+    var createDataTable = function(series, columnType, role) {
+      typeof role == 'undefined' ? false : role
+
       var data = new google.visualization.DataTable();
       data.addColumn(columnType, "");
 
-      var i, j, s, d, key, role, rows = [];
+      var i, j, s, d, r, key, rows = [];
       for (i = 0; i < series.length; i++) {
         s = series[i];
         data.addColumn("number", s.name);
-        data.addColumn({type: "string", role: "tooltip"});
 
+        if (role === true) {
+          data.addColumn({type: "string", role: "tooltip"});
+        }
+        
         for (j = 0; j < s.data.length; j++) {
           d = s.data[j];
           key = (columnType === "datetime") ? d[0].getTime() : d[0];
-          role = d[2];
+          r = d[2];
 
           if (!rows[key]) {
             rows[key] = new Array(series.length);
           }
-          if (role) {
-            rows[key][i] = [toFloat(d[1]), role];
+          if (r) {
+            rows[key][i] = [toFloat(d[1]), r];
           } else {
             rows[key][i] = toFloat(d[1]);
           }
@@ -449,8 +454,12 @@
 
     renderColumnChart = function(element, series, opts) {
       waitForLoaded(function() {
+        var role = false
+        if (opts["library"]) {
+          role = opts["library"]["tooltip"]
+        }
         var options = jsOptions(series, opts);
-        var data = createDataTable(series, "string");
+        var data = createDataTable(series, "string", role);
         var chart = new google.visualization.ColumnChart(element);
         resize( function() {
           chart.draw(data, options);
