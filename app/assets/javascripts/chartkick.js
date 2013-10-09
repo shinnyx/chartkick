@@ -365,31 +365,35 @@
 
     // cant use object as key
     var createDataTable = function(series, columnType) {
-      // if(typeof(tooltip) === "undefined") tooltip = false;
       var data = new google.visualization.DataTable();
       data.addColumn(columnType, "");
-      // if (tooltip) {
-      data.addColumn({type: "string", role: "tooltip"});
-      // }
-      var i, j, s, d, key, rows = [];
+
+      var i, j, s, d, key, role, rows = [];
       for (i = 0; i < series.length; i++) {
         s = series[i];
         data.addColumn("number", s.name);
+        data.addColumn({type: "string", role: "tooltip"});
 
         for (j = 0; j < s.data.length; j++) {
           d = s.data[j];
           key = (columnType === "datetime") ? d[0].getTime() : d[0];
+          role = d[2];
+
           if (!rows[key]) {
             rows[key] = new Array(series.length);
           }
-          rows[key][i] = toFloat(d[1]);
+          if (role) {
+            rows[key][i] = [toFloat(d[1]), role];
+          } else {
+            rows[key][i] = toFloat(d[1]);
+          }
         }
       }
 
       var rows2 = [];
       for (i in rows) {
         if (rows.hasOwnProperty(i)) {
-          rows2.push([(columnType === "datetime") ? new Date(toFloat(i)) : i].concat(rows[i]));
+          rows2.push( [(columnType === "datetime") ? new Date(toFloat(i)) : i].concat([].concat.apply([], rows[i])) );
         }
       }
       if (columnType === "datetime") {
