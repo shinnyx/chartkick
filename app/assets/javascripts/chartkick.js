@@ -365,7 +365,7 @@
 
     // cant use object as key
     var createDataTable = function(series, columnType, role) {
-      typeof role == 'undefined' ? false : role
+      role = 'undefined' ? false : true
 
       var data = new google.visualization.DataTable();
       data.addColumn(columnType, "");
