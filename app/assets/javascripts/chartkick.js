@@ -365,7 +365,7 @@
 
     // cant use object as key
     var createDataTable = function(series, columnType, role) {
-      role = 'undefined' ? false : true
+      typeof role === 'undefined' ? false : role
 
       var data = new google.visualization.DataTable();
       data.addColumn(columnType, "");
@@ -375,7 +375,7 @@
         s = series[i];
         data.addColumn("number", s.name);
 
-        if (role === true) {
+        if (role) {
           data.addColumn({type: "string", role: "tooltip"});
         }
         
