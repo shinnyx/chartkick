@@ -370,27 +370,32 @@
       var data = new google.visualization.DataTable();
       data.addColumn(columnType, "");
 
-      var i, j, s, d, r, key, rows = [];
+      var i, j, s, d, r, c, key, rows = [];
+      // iternate through each series
       for (i = 0; i < series.length; i++) {
         s = series[i];
+        data.addColumn("number", s.name);
+
+        // hack for coloured area
         data.addColumn("number", s.name);
 
         if (role) {
           data.addColumn({type: "string", role: "tooltip"});
         }
-        
+
         for (j = 0; j < s.data.length; j++) {
           d = s.data[j];
           key = (columnType === "datetime") ? d[0].getTime() : d[0];
-          r = d[2];
+          c = d[2];
+          r = d[3];
 
           if (!rows[key]) {
             rows[key] = new Array(series.length);
           }
           if (r) {
-            rows[key][i] = [toFloat(d[1]), r];
+            rows[key][i] = [toFloat(d[1]), toFloat(c), r];
           } else {
-            rows[key][i] = toFloat(d[1]);
+            rows[key][i] = [toFloat(d[1]), toFloat(c)];
           }
         }
       }
@@ -594,7 +599,7 @@
   }
 
   function processSeries(series, opts, time) {
-    var i, j, data, r, key, role;
+    var i, j, data, r, key, role, colored_section;
 
     // see if one series or multiple
     if (!isArray(series) || typeof series[0] !== "object" || isArray(series[0])) {
@@ -611,12 +616,13 @@
       for (j = 0; j < data.length; j++) {
         key = data[j][0];
         key = time ? toDate(key) : toStr(key);
-        role = data[j][2]; // Google Chart's role
+        role = data[j][3]; // Google Chart's role
+        colored_section = data[j][2]
         if (role) {
           role = time ? toDate(role) : toStr(role);
-          r.push([key, toFloat(data[j][1]), role]);
+          r.push([key, toFloat(data[j][1]), colored_section, role]);
         } else {
-          r.push([key, toFloat(data[j][1])]);  
+          r.push([key, toFloat(data[j][1]), colored_section]);  
         }
       }
       if (time) {
