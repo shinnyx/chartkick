@@ -376,9 +376,15 @@
         s = series[i];
         data.addColumn("number", s.name);
 
+        // add column for role
+        if (role) {
+          data.addColumn({type: "string", role: "tooltip"});
+        }
+
         // hack for coloured area
         data.addColumn("number", s.name);
 
+        // role column for hacked area
         if (role) {
           data.addColumn({type: "string", role: "tooltip"});
         }
@@ -386,14 +392,14 @@
         for (j = 0; j < s.data.length; j++) {
           d = s.data[j];
           key = (columnType === "datetime") ? d[0].getTime() : d[0];
-          c = d[2];
-          r = d[3];
+          c = d[3];
+          r = d[2];
 
           if (!rows[key]) {
             rows[key] = new Array(series.length);
           }
           if (r) {
-            rows[key][i] = [toFloat(d[1]), toFloat(c), r];
+            rows[key][i] = [toFloat(d[1]), r, toFloat(c), r];
           } else {
             rows[key][i] = [toFloat(d[1]), toFloat(c)];
           }
@@ -616,13 +622,13 @@
       for (j = 0; j < data.length; j++) {
         key = data[j][0];
         key = time ? toDate(key) : toStr(key);
-        role = data[j][3]; // Google Chart's role
-        colored_section = data[j][2]
+        role = data[j][2]; // Google Chart's role
+        colored_section = data[j][3]
         if (role) {
           role = time ? toDate(role) : toStr(role);
-          r.push([key, toFloat(data[j][1]), colored_section, role]);
+          r.push([key, toFloat(data[j][1]), role, toFloat(colored_section), role]);
         } else {
-          r.push([key, toFloat(data[j][1]), colored_section]);  
+          r.push([key, toFloat(data[j][1]), toFloat(colored_section)]);  
         }
       }
       if (time) {
