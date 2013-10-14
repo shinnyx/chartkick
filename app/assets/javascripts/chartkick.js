@@ -454,6 +454,7 @@
         var data = new google.visualization.DataTable();
         data.addColumn("string", "");
         data.addColumn("number", "Value");
+        data.addColumn({type: "string", role: "tooltip"});
         data.addRows(series);
 
         var chart = new google.visualization.PieChart(element);
@@ -651,7 +652,7 @@
   function processPieData(element, data, opts) {
     var perfectData = toArr(data), i;
     for (i = 0; i < perfectData.length; i++) {
-      perfectData[i] = [toStr(perfectData[i][0]), toFloat(perfectData[i][1])];
+      perfectData[i] = [toStr(perfectData[i][0]), toFloat(perfectData[i][1]), toStr(perfectData[i][2])];
     }
     renderPieChart(element, perfectData, opts);
   }
